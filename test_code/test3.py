@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Description : 原型代码2 增加数据量测试三词链记忆模型，以及测试记忆与回忆同时进行
+Description : 原型代码2 增加数据量测试n词链记忆模型，以及测试记忆与回忆同时进行
+abc:
+-a -b -ab -bc -abc -c
+
+先做句子内部记忆，句子之间先不做
 date：          2023/10/15
 """
 import jieba
@@ -52,6 +56,17 @@ def learn():
                     words_dicts[last_word][word] = [t, activate_count + 1]
             last_word = word
     return words_dicts
+
+
+def new_learn():
+    # 1 句子根据标点拆成词组
+    words_dicts = {}  # abc:1, ab:1, ac:1 b:1 bc:1 c:1
+    words = read_file()
+    index = 0
+    for word in words:
+        index += 1
+        if not re.match(r'[，。?!]+', word):
+    # 记忆
 
 
 def first_read(words_dicts, input):
