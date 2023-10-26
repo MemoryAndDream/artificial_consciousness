@@ -55,7 +55,7 @@ def first_read(words_dicts, input):
     print(input)
     output_dicts = {}
 
-    for i in range(20):
+    for i in range(100):
         # 不断输出下一个最强词。如果思维中断了，那就从最近几个词找。
         if not words_dicts[last_word]:
             break
@@ -75,7 +75,7 @@ def first_read(words_dicts, input):
 
 def main():
     words_dicts = learn()
-    input = '小女孩'
+    input = '北极'
     first_read(words_dicts, input)
 
 

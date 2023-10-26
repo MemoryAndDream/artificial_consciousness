@@ -20,7 +20,7 @@ def read_file():
         return words
 
 
-def f_tired(t):
+def f_tired(t):  # 不疲劳容易死循环
     return t / 10 if t < 10 and t > 0 else 1
 
 
@@ -32,41 +32,42 @@ def f_link(linked):
     return 10 if linked else 1
 
 
-def learn():
-    # 3词链模型，但是出现标点截止
-    words_dicts = {}
-    words = read_file()
-    first_word = ''
-    second_word = ''
-    third_word = ''
-    t = 0
-    for i in range(len(words)):
-        this_word = words[i]
-        if re.match(r'[\u4e00-\u9fa5\w，。?!]+', this_word):
-            # print(word)
-            # t += 1 # 长期记忆先不计算疲劳
-            if word not in words_dicts:
-                words_dicts[word] = {}
-            if first_word:
-                # 记录下一个词的激活时间，激活次数
-                if not word in words_dicts[last_word]:
-                    words_dicts[last_word][word] = [t, 1]  # [t,n]
-                else:
-                    activate_count = words_dicts[last_word][word][1]
-                    words_dicts[last_word][word] = [t, activate_count + 1]
-            last_word = word
-    return words_dicts
+def f_forget(d):
+    return 1 / (2 ** d)
 
 
 def new_learn():
-    # 1 句子根据标点拆成词组
+    # 先不考虑标点，测试跨词模型，跨度4词,先不添加助记词
     words_dicts = {}  # abc:1, ab:1, ac:1 b:1 bc:1 c:1
     words = read_file()
     index = 0
-    for word in words:
+    last_words = ['', '', '', '', '', '']
+    t = 0  # 先不考虑疲劳
+    for this_word in words:
+        this_word = this_word.strip()
+        if not re.match(r'[\u4e00-\u9fa5\w，。]+', this_word):
+            continue
         index += 1
-        if not re.match(r'[，。?!]+', word):
-    # 记忆
+        if index < 7:  # 从第7个词开始记 前面几个先不记了
+            pass
+        else:
+            distance = 6
+            for old_word in last_words:
+                if old_word not in words_dicts:
+                    words_dicts[old_word] = {}
+                    # 记录下一个词的激活时间，激活次数
+                if not this_word in words_dicts[old_word]:
+                    words_dicts[old_word][this_word] = [t, f_forget(distance)]  # [t,n]
+                else:
+                    activate_count = words_dicts[old_word][this_word][1]
+                    words_dicts[old_word][this_word] = [t, activate_count + f_forget(distance)]
+
+                distance -= 1
+
+        last_words.pop(0)
+        last_words.append(this_word)
+
+    return words_dicts
 
 
 def first_read(words_dicts, input):
@@ -74,7 +75,7 @@ def first_read(words_dicts, input):
     print(input)
     output_dicts = {}
 
-    for i in range(20):
+    for i in range(100):
         # 不断输出下一个最强词。如果思维中断了，那就从最近几个词找。
         if not words_dicts[last_word]:
             break
@@ -83,7 +84,7 @@ def first_read(words_dicts, input):
             for word in words_dicts[last_word]:
                 t, activate_count = words_dicts[last_word][word]
                 exciting = f_tired(i - t) * f_strengthen(activate_count) * f_tired(i - output_dicts.get(word, 0))
-
+                # 这里不对！回忆要和记忆的逻辑整合！不能只看上一个词 代码整合一下
                 if exciting > max_exciting:
                     max_exciting, next_word = exciting, word
             words_dicts[last_word][next_word] = [i, words_dicts[last_word][next_word][1] + 1]
@@ -93,7 +94,7 @@ def first_read(words_dicts, input):
 
 
 def main():
-    words_dicts = learn()
+    words_dicts = new_learn()
     input = '北极'
     first_read(words_dicts, input)
 
