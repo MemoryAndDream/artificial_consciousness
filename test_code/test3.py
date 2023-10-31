@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Description : 原型代码2 增加数据量测试n词链记忆模型，以及测试记忆与回忆同时进行
+Description : 原型代码3 简化多词关系为双词关系
 abc:
 -a -b -ab -bc -abc -c
 
-先做句子内部记忆，句子之间先不做
 date：          2023/10/15
 """
 import jieba
@@ -14,7 +13,7 @@ import sys
 
 
 def read_file():
-    with open('/Users/mengzhihao/work/py3/artificial_consciousness/articles/big_txt/atsth.txt') as f:
+    with open('../articles/big_txt/atsth.txt',encoding='utf8') as f:
         contents = f.read()
         contents = re.sub("\s", '', contents)
         words = jieba.cut(contents, cut_all=False)
@@ -91,13 +90,13 @@ def first_read(words_dicts, input):
 
                     t, activate_count = words_dicts[old_word].get(word, [0, 0])
                     if activate_count:
-                        exciting += f_tired(i - t) * activate_count * f_tired(
+                        exciting += f_tired(i - t) * f_strengthen(activate_count) * f_tired(
                             i - output_dicts.get(word, 0))  # 注意，记的时候已经计算过距离衰减了，回忆的时候就不用了
 
                 # 这里不对！回忆要和记忆的逻辑整合！不能只看上一个词 代码整合一下
                 if exciting > max_exciting:
                     max_exciting, next_word = exciting, word
-            # words_dicts[last_word][next_word] = [i, words_dicts[last_word][next_word][1] + 1]  # 先不考虑疲劳和回忆中记忆s
+            words_dicts[last_word][next_word][0] = i  # 先不考虑回忆中记忆s
             output_dicts[last_word] = i
             previous_words.pop(0)
             previous_words.append(next_word)
