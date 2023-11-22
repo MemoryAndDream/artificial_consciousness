@@ -9,6 +9,8 @@
 
 人类视觉的一些抽象可以直接当做已知的抽象概念联系
 比如空格分隔出的都是一个词
+
+感觉还是要建立完整brain模型，再研究怎么训练
 '''
 
 
@@ -48,7 +50,7 @@ def gen_knowledge():
     for i in range(ord('a'), ord('z') + 1):  # 实际人类通过视觉提取特征，这里没有视觉，所以只能先学习字母的抽象
         for j in range(10):
             print(chr(i) * j, f'{j}个{chr(i)}')
-            knowledges.append([chr(i) * j, j, '个', chr(i)])  # 可能还需要学习本身的概念
+            knowledges.append([chr(i)] * j + [j, '个', chr(i)])  # 可能还需要学习本身的概念
 
     return knowledges
 
@@ -57,8 +59,14 @@ def test():
     xiaoming = brain()
 
     xiaoming.learn(gen_knowledge())
-    xiaoming.test(['6', '+', '9', '='])
+    xiaoming.test(['a'])
+    xiaoming.test(['a'])
+    xiaoming.test(['a'])
+    xiaoming.test(['a'])
+    xiaoming.test(['a'])
+    xiaoming.test(['b'])
+    xiaoming.test(['b'])  # 缺少遗忘逻辑，导致不能重置
 
 
 if __name__ == '__main__':
-    gen_knowledge()
+    test()
