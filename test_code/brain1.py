@@ -22,9 +22,16 @@ date：          2023/11/22
 '''
 
 
-class brain():
+class nerons():
+    def __init__(self):
+        pass
 
-    def listen(self):  # 听和想同时进行
+
+class brain():
+    def __init__(self):
+        self.nerons = []
+
+    def listen(self, sth):  # 听和想同时进行
         pass
 
     def think(self):
@@ -32,3 +39,8 @@ class brain():
 
     def speak(self):  # 想到的不一定要说出来 思考是自由的，但是行为需要目的 暂且追求一下正确
         pass
+
+
+if __name__ == '__main__':
+# no
+# idea....
