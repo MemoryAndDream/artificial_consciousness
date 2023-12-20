@@ -22,7 +22,7 @@ class Baby:
         options = ['cry', 'shout', 'speak', 'eat', 'sleep', 'think']
 
     def senses(self):
-        options = ['listen', 'see']
+        options = ['hearing', 'vision']
 
     def status(self):
         options = ['hungry', 'sleepy', 'lonely']
@@ -30,18 +30,10 @@ class Baby:
 
 def live():
     baby = Baby()
-    for day in  range(365):
+    for day in range(365):
         baby.senses()
         baby.emotion()
         baby.operation()
 
 
-'''
-想想看要怎么养宝宝
-首先，宝宝会饿，饿了的本能就是哭
-哭了就要喂
-宝宝能看见喂的人是谁
-吃东西饱了本能就会高兴
-
-'''
 
