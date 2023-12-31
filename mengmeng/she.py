@@ -4,12 +4,18 @@ Description :
 date：          2023/12/22
 """
 
+from event import *
+
+class Status():
+    def __init__(self):
+        self.hp = 100  # 饥饿值
+        self.happy = 50  # 心情
+
 
 class Body:
     def __init__(self):
-        self.status = {}
         self.create_body()
-
+        self.status = Status()
 
 
     def create_body(self):
@@ -22,6 +28,7 @@ class Body:
 class MengMeng:
     def __init__(self):
         self.body = Body()
+        self.events = []
 
     def live(self):
         # As time goes by, she lives
@@ -32,19 +39,26 @@ class MengMeng:
 
 
     def get_input(self):
-        pass
+        # 接受外来的所有事件
+        self.events.append(TimePassEvent())
 
 
     def do_something(self):
         # eat
-        event = {}
-        self.body.stomach.handle(event)
+        for event in self.events:
+            self.body.stomach.handle(event)
+
+        self.events = []
 
     def refresh_status(self):
-        pass
+        if self.body.status.hp < 50:
+            self.body.status.happy -= 1
+        if self.body.status.happy<50:
+            self.events.append(SadEvent())
 
 
 if __name__ == '__main__':
     meng_meng = MengMeng()
-    meng_meng.live()
-    print(meng_meng.body.status)
+    for i in range(60):
+        meng_meng.live()
+        print(meng_meng.body.status.hp)
