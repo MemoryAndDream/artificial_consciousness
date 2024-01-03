@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Description :
+Description : 组装模块
 date：          2023/12/22
 """
 
@@ -30,17 +30,17 @@ class MengMeng:
         self.body = Body()
         self.events = []
 
-    def live(self):
+    def live(self, events=[]):
         # As time goes by, she lives
-        self.get_input()
+        self.get_input(events)
         self.do_something()
         self.refresh_status()
 
 
 
-    def get_input(self):
+    def get_input(self,events):
         # 接受外来的所有事件
-        self.events.append(TimePassEvent())
+        self.events.extend(events)
 
 
     def do_something(self):
@@ -58,7 +58,16 @@ class MengMeng:
 
 
 if __name__ == '__main__':
-    meng_meng = MengMeng()
-    for i in range(60):
-        meng_meng.live()
+    import pickle,os
+    cache = 'mengmeng.plk'
+    if os.path.exists(cache):
+        with open(cache, 'rb') as r:
+            meng_meng = pickle.load(r)
+    else:
+        meng_meng = MengMeng() #
+    for i in range(10):
+        meng_meng.live([TimePassEvent()])
         print(meng_meng.body.status.hp)
+    with open(cache,'wb') as f:
+        pickle.dump(meng_meng, f)
+
