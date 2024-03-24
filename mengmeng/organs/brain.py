@@ -7,12 +7,13 @@ Description : 大脑 负责记忆 情感
 date：          2024/1/3
 """
 from organs.organ import Organ
+
+
 class Brain(Organ):
     def __init__(self, body=None, name='brain'):
-        super().__init__(body,name)
+        super().__init__(body, name)
         self.nerons = []
-        self.output = [] # 输出信号
-
+        self.output = []  # 输出信号
 
     def handle(self, event):
         if event.name == 'time_pass':
@@ -25,9 +26,13 @@ class Brain(Organ):
     def think(self):
         pass
 
-
     def see(self):
         pass
 
     def hear(self):
+        pass
+
+    def feel(self, feeling):
+        # 接收其他器官的直接感触 比如饿，饱，痛
+
         pass

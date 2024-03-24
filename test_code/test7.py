@@ -50,7 +50,7 @@ def gen_knowledge():
     knowledges = []
     for i in range(ord('a'), ord('z') + 1):  # 实际人类通过视觉提取特征，这里没有视觉，所以只能先学习字母的抽象
         for j in range(10):
-            print(chr(i) * j, f'{j}个{chr(i)}')
+            print('记忆：', chr(i) * j, f'{j}个{chr(i)}')
             knowledges.append([chr(i)] * j + [j, '个', chr(i)])  # 可能还需要学习本身的概念
 
     return knowledges
