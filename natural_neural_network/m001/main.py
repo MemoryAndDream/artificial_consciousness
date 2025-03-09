@@ -8,78 +8,149 @@
 # 三点模型测试
 # 万事开头难，坚持难
 
-GLOBAL_TIMESTAMP = 0
-ALL_LINKS = []
+# 初期的事件已经可以训练出具体神经网络了，但是问题是后续事件不好触发，还是应该定义一个神经元的整体，这样才能定位出输入输出
 
 
 class Node:
-    def __init__(self,name):
-        self.id=id(self)
+    def __init__(self,name): # 为了方便研究，就用name当成id好了
+        # self.id=id(self)#
         self.name=name
-        print(self.id)
-        self.ms = {} # 神经末梢
+        self.id = name
 
 
-    def connect(self,next_id,strength=1):
-        if next_id not in self.ms:
-            self.ms[next_id] = 0 # 统计链接次数
-        self.ms[next_id] += strength
+    def init_connect(self, next_node,strength=100):
+        link = Link(self.id,next_node.id, strength)
+        return link
 
     def act(self):
         pass
 
 class Link:
-    def __init__(self,source,target):
-        self.source = source
-        self.target = target
+    def __init__(self,source_id,target_id,strength,active_at=0):
+        self.source_id = source_id
+        self.target_id = target_id
+        self.strength = strength
+        self.active_at = active_at
 
-def progress():
-    global GLOBAL_TIMESTAMP
+class Mind:
+    def __init__(self):
+        self.all_links = []
+        self.all_nodes = []
+        self.time_stamp = 0
 
-    eye1 = Node('eye1')
-    eye2 = Node('eye2')
-    eye3 = Node('eye3')
-    mouth1 = Node('mouth1')
-    mouth2 = Node('mouth2')
-    mouth3 = Node('mouth3')
-    ear1 = Node('ear1')
-    ear2 = Node('ear2')
-    ear3 = Node('ear3')
+    def add_node(self, node_name='') -> Node:
+        node = Node(node_name)
+        self.all_nodes.append(node)
+        return node
+
+    def init_connect(self,node1:Node, node2:Node):
+
+        self.all_links.append(node1.init_connect(node2))
+
+
+    def create_or_strenth_link(self, source, target, strength=1):
+        find_link = False
+        if isinstance(source,Node):
+            source_id = source.id
+            target_id = target.id
+        else:
+            source_id, target_id = source,target
+        for link in self.all_links:
+            if link.source_id == source_id and link.target_id == target_id:
+                find_link = True
+                link.strength = link.strength+1
+        if not find_link:
+            link = Link(source_id, target_id, strength)
+            self.all_links.append(link)
+
+
+    def timepass(self, target_id):
+        # 计算这一时间发生的神经元活动
+        # 先简化为当前只有一个target被激活
+        for link in self.all_links:
+            if link.active_at > self.time_stamp -3:
+                self.create_or_strenth_link(link.source_id,target_id) # 这里其实要优化，越近的加强越大
+        self.time_stamp += 1
+
+    def get_node(self,node_name) -> Node:
+        for node in self.all_nodes:
+            if node.name == node_name:
+                return node
+
+
+def progress(baby_mind:Mind):
+    eye1 = baby_mind.add_node('eye1')
+    eye2 = baby_mind.add_node('eye2')
+    eye3 = baby_mind.add_node('eye3')
+    mouth1 = baby_mind.add_node('mouth1')
+    mouth2 = baby_mind.add_node('mouth2')
+    mouth3 = baby_mind.add_node('mouth3')
+    ear1 = baby_mind.add_node('ear1')
+    ear2 = baby_mind.add_node('ear2')
+    ear3 = baby_mind.add_node('ear3')
 
     # 自然连接
-    eye1.connect(eye2,100)
-    eye2.connect(eye3,100)
-    mouth1.connect(mouth2,100)
-    mouth2.connect(mouth3,100)
-    ear1.connect(ear2,100)
-    ear2.connect(ear3,100)
+    baby_mind.init_connect(eye1,eye2)
+    baby_mind.init_connect(eye2, eye3)
+    baby_mind.init_connect(mouth1, mouth2)
+    baby_mind.init_connect(mouth2, mouth3)
+    baby_mind.init_connect(ear1, ear2)
+    baby_mind.init_connect(ear2, ear3)
 
     # 训练事件
     # 不由自主喊妈妈，激活顺序： mouth1-2,2-3
-    mouth1.connect(mouth2)
-    GLOBAL_TIMESTAMP+=1
-    mouth2.connect(mouth3)
-    GLOBAL_TIMESTAMP+=1
+    baby_mind.create_or_strenth_link(mouth1, mouth2)
+
+
+    baby_mind.create_or_strenth_link(mouth2, mouth3)
+    
+    baby_mind.timepass(mouth3.id)
     # 然后耳朵收到信号 ear1-2,2-3
-    ear1.connect(ear2)
-    GLOBAL_TIMESTAMP+=1
-    ear2.connect(ear3)
-    GLOBAL_TIMESTAMP+=1
+    baby_mind.create_or_strenth_link(ear1,ear2)
+    baby_mind.timepass(ear2.id)
+    baby_mind.create_or_strenth_link(ear2,ear3)
+    baby_mind.timepass(ear3.id)
 
     # 这时候如果妈妈来了 eye1-2,2-3
-    eye1.connect(eye2)
-    GLOBAL_TIMESTAMP += 1
-    eye2.connect(eye3)
-    GLOBAL_TIMESTAMP += 1
-
-    # 在这个过程中如何根据时间先后加强连接
-    # 逻辑： 最近激活的前几个神经元会连接到本次的目标神经元， 强度根据时间
+    baby_mind.create_or_strenth_link(eye1,eye2)
+    baby_mind.timepass(eye2.id)
+    baby_mind.create_or_strenth_link(eye2,eye3)
+    baby_mind.timepass(eye3.id)
 
 
+
+
+def detect_links(baby_mind:Mind):
+    for link in baby_mind.all_links:
+        print(link.source_id, link.target_id, link.strength)
+
+def test_event1(baby_mind: Mind):
+    # 测试事件 通过对神经冲动的追踪反映思维
+    # 事件： 妈妈出现了
+    eye1 = baby_mind.get_node('eye1')
+    eye1.act()
+
+def test_mind(baby_mind:Mind):
+    # 测试回忆 其实也是事件
+    # 事件，听到妈妈这个词
+    pass
 
 
 def main():
-    pass
+    baby_mind = Mind()
+    progress(baby_mind)
+    # test_event1(baby_mind)
+
+    detect_links(baby_mind)
+    # 测试结果： eye1 会引发mouth3 和ear3的输出
+    # ear1 会引发mouth3
+    # 没有引发eye3的 可能是因为没有进一步学习与回忆，或者说，看到妈妈能喊妈妈，但是听到则还想不到，存在先后顺序问题，这就是顺序记忆，看到妈妈在说话之后
+
+    # 要进一步学习需要先看到妈妈，然后回忆引发动作
+
+
+
+
 
 
 
